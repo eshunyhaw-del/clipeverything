@@ -234,7 +234,7 @@ def cmd_prepare(a):
                 die("this is a LIVE stream - use the clipeverything-live skill instead")
             meta = {k: info.get(k) for k in (
                 "id", "title", "uploader", "channel", "duration", "webpage_url",
-                "upload_date", "tags", "categories", "chapters")}
+                "upload_date", "tags", "categories", "chapters", "license")}
             meta["description"] = (info.get("description") or "")[:800]
             meta["source"] = src
             meta["local"] = False
@@ -254,6 +254,14 @@ def cmd_prepare(a):
             media.unlink(missing_ok=True)
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    if not local and "license" not in meta:  # work folder made by an older version: add the license
+        r = run(ytdlp_base() + ["--dump-single-json", "--skip-download", src],
+                capture_output=True, text=True, encoding="utf-8")
+        try:
+            meta["license"] = json.loads(r.stdout).get("license")
+        except Exception:
+            meta["license"] = None
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if not tr_path.exists():
         log("transcribing (this is the slow part; ~1 min per 10 min of video on a normal PC)...")
@@ -502,13 +510,34 @@ def render_clip(src, ss, dur, words, abs_start, title, out_mp4, workdir,
     return info["layout"]
 
 
-def write_post_text(path, title, caption, hashtags, source, start, end):
+def credit_block(meta):
+    """Credit text for the post, based on the source's license (read from yt-dlp)."""
+    if not meta:
+        return ""
+    if meta.get("local"):
+        return "CREDIT: local file - make sure you own it or have permission to post it."
+    lic = (meta.get("license") or "").strip()
+    who = meta.get("uploader") or meta.get("channel") or "the creator"
+    url = meta.get("webpage_url") or meta.get("source") or ""
+    title = meta.get("title") or ""
+    if "creative commons" in lic.lower():
+        return ("CREDIT (the license requires this - paste it into your post):\n"
+                f'Clip from "{title}" by {who}, licensed CC BY. Original: {url} - edited for length and format.\n'
+                "Do not imply the creator endorses you.")
+    return ("CREDIT - NO REUSE LICENSE DETECTED: this is probably standard copyright. Get the creator's "
+            "permission before posting publicly.\n"
+            f'If you have permission, credit it like: "Clip from "{title}" by {who}, {url}, used with permission."')
+
+
+def write_post_text(path, title, caption, hashtags, source, start, end, meta=None):
     tags = hashtags.strip()
     if tags and not tags.startswith("#"):
         tags = " ".join("#" + t.lstrip("#") for t in re.split(r"[,\s]+", tags) if t)
+    credit = credit_block(meta)
     Path(path).write_text(
         f"TITLE: {title}\n\nCAPTION:\n{caption}\n\n{tags}\n\n"
-        f"SOURCE: {source}\nTIME: {fmt_ts(start)} - {fmt_ts(end)}\n", encoding="utf-8")
+        + (credit + "\n\n" if credit else "")
+        + f"SOURCE: {source}\nTIME: {fmt_ts(start)} - {fmt_ts(end)}\n", encoding="utf-8")
 
 
 # --------------------------------------------------------------------------
@@ -587,7 +616,7 @@ def cmd_cut(a):
     layout = render_clip(video, start - t0, dur, words, start, a.title, out, wd,
                          a.layout if a.layout != "auto" else None, a.facecam, tag=out.stem[:40])
     write_post_text(out.with_suffix(".txt"), a.title, a.caption or "", a.hashtags or "",
-                    meta.get("webpage_url") or meta.get("source"), start, end)
+                    meta.get("webpage_url") or meta.get("source"), start, end, meta)
     print(json.dumps({"ok": True, "clip": str(out), "post_text": str(out.with_suffix(".txt")),
                       "layout": layout, "length_seconds": round(dur, 1),
                       "from": fmt_ts(start), "to": fmt_ts(end)}, indent=1))

@@ -54,5 +54,7 @@ If `$PY` does not exist, setup has never been run.
   (not generic spam).
 - If the download fails on Instagram or Facebook, the post is probably login-only. Tell the user to set
   `CLIPEVERYTHING_COOKIES_BROWSER` (e.g. `firefox`) or `CLIPEVERYTHING_COOKIES_FILE` as described in the README. Private videos cannot be clipped.
-- The user is responsible for having the right to repost the source video. Mention it once if the source is
-  someone else's content and the user is posting publicly; do not lecture.
+- Every clip's `.txt` has a CREDIT section made from the source's license. If the video is Creative Commons (CC BY),
+  the credit line is required by the license: tell the user to paste it into the post. If no reuse license was found,
+  the section says to get the creator's permission before posting publicly. Say which case applies in your report,
+  once, in one sentence; do not lecture.

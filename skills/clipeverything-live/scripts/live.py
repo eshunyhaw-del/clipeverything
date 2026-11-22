@@ -230,7 +230,8 @@ def cmd_clip(a):
         n += 1
     layout = C.render_clip(src, start - t0, end - start, words, start, a.title, out, wd,
                            a.layout if a.layout != "auto" else None, a.facecam, tag=out.stem[:40])
-    C.write_post_text(out.with_suffix(".txt"), a.title, a.caption, a.hashtags, st["url"], start, end)
+    C.write_post_text(out.with_suffix(".txt"), a.title, a.caption, a.hashtags, st["url"], start, end,
+                      {"title": st["title"], "webpage_url": st["url"], "source": st["url"], "license": None})
     print(json.dumps({"ok": True, "clip": str(out), "post_text": str(out.with_suffix(".txt")),
                       "layout": layout, "length_seconds": round(end - start, 1)}, indent=1))
 
