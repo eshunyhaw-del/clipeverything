@@ -47,9 +47,18 @@ Open Claude Code and say:
 - **clip this video** `<link>`
 - **find the best 5 moments in this** `<link>` **for TikTok**
 - **clip this history lecture** `<file path>`
+- **clip a video** (finds a reusable one for you)
 - **live clip** `<link>` (for a stream that is live right now)
 
 Clips land in `%USERPROFILE%\Clips\<date>\`. Each has an `.mp4` and a `.txt` with title, caption and hashtags.
+
+## Find something to clip (clipeverything-scout)
+
+Say **clip a video** or **find me a video about stoicism to clip**. The `clip-scout` agent searches YouTube's Creative Commons filter across your niches (science, psychology, religion, philosophy, language, tech) or the topic you name, then verifies each video's license (CC BY) before suggesting it, skips videos you already clipped, and recommends one. Then the normal clipeverything workflow takes over. If search is blocked or nothing fits, paste a link instead and it will tell you whether that video is CC BY.
+
+Read `skills/clipeverything-scout/references/monetization.md` before posting reused clips: a CC BY license gives you copyright permission, but YouTube can still limit monetization on channels that mostly reuse other people's content without adding their own value.
+
+For the agent, copy `agents\clip-scout.md` to `%USERPROFILE%\.claude\agents\` (the plugin install does this for you).
 
 ## How it works
 
