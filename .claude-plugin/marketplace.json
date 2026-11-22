@@ -1,0 +1,11 @@
+{
+  "name": "clipeverything",
+  "owner": { "name": "eshunyhaw-del" },
+  "plugins": [
+    {
+      "name": "clipeverything",
+      "source": "./",
+      "description": "Clip any video into ready-to-post vertical clips with hook titles and word-by-word captions. Finished and live. Windows."
+    }
+  ]
+}

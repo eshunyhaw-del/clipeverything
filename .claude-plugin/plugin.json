@@ -1,0 +1,7 @@
+{
+  "name": "clipeverything",
+  "version": "0.1.0",
+  "description": "Clip any video (YouTube, Facebook, Instagram, TikTok, X, Twitch, Kick or a file) into ready-to-post vertical clips with hook titles and word-by-word captions. Finished and live. Windows.",
+  "author": { "name": "eshunyhaw-del" },
+  "license": "MIT"
+}
