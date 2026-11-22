@@ -262,6 +262,10 @@ def cmd_prepare(a):
         except Exception:
             meta["license"] = None
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    if not meta.get("duration"):  # some sites (Instagram) report no length: use the audio's
+        with wave.open(str(wav), "rb") as wf:
+            meta["duration"] = wf.getnframes() / wf.getframerate()
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if not tr_path.exists():
         log("transcribing (this is the slow part; ~1 min per 10 min of video on a normal PC)...")
@@ -446,7 +450,10 @@ def build_ass(path, words, abs_start, dur, title, layout):
         w["e"] = min(dur, w["e"])
     groups, cur = [], []
     for w in ws:
-        if cur and (len(cur) >= 3 or w["s"] - cur[-1]["e"] > 0.8 or re.search(r"[.?!]$", cur[-1]["w"])):
+        chars = sum(len(x["w"]) + 1 for x in cur) + len(w["w"])
+        # max 3 words and ~15 characters so a caption line always fits inside the 1080px frame
+        if cur and (len(cur) >= 3 or chars > 15 or w["s"] - cur[-1]["e"] > 0.8
+                    or re.search(r"[.?!]$", cur[-1]["w"])):
             groups.append(cur)
             cur = []
         cur.append(w)
@@ -461,7 +468,7 @@ def build_ass(path, words, abs_start, dur, title, layout):
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, "
         "Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, "
         "Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
-        "Style: Cap,Arial,86,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,8,2,5,60,60,0,1",
+        "Style: Cap,Arial,80,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,8,2,5,60,60,0,1",
         "Style: Title,Arial,62,&H00000000,&H000000FF,&H00FFFFFF,&H00000000,-1,0,0,0,100,100,0,0,3,16,0,8,70,70,0,1",
         "", "[Events]",
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
