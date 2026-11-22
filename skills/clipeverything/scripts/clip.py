@@ -605,7 +605,7 @@ def cmd_cut(a):
     dur = end - start
 
     video, t0 = get_source_video(wd, meta, start, end)
-    words = [w for sg in tr["segments"] for w in sg["words"]]
+    words = [] if a.no_captions else [w for sg in tr["segments"] for w in sg["words"]]
     day = OUT_ROOT / dt.date.today().isoformat()
     name = a.name or slugify(a.title)
     out = day / f"{name}.mp4"
@@ -676,6 +676,8 @@ def main():
     c.add_argument("--facecam", default=None, help="x,y,w,h as 0-1 fractions, if auto-detect gets it wrong")
     c.add_argument("--max-len", type=float, default=90.0)
     c.add_argument("--no-snap", action="store_true")
+    c.add_argument("--no-captions", action="store_true",
+                   help="skip our captions (use when the source already has subtitles burned in)")
     c.add_argument("--overwrite", action="store_true")
     c.set_defaults(fn=cmd_cut)
 

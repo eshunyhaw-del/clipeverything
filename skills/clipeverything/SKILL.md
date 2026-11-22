@@ -43,6 +43,9 @@ If `$PY` does not exist, setup has never been run.
 5. **Check at least one clip** by pulling a frame:
    `ffmpeg -y -ss 3 -i "<clip.mp4>" -frames:v 1 "<workdir>\check.png"` and looking at it.
    Fix layout problems before reporting.
+   If the source already has subtitles burned into the picture (common on news and media-brand videos), our captions
+   will clash with them: re-render with `--no-captions --overwrite`. A logo in the top corner can sit under the
+   title; mention it if it does.
 6. **Report.** For each clip: file path, time range in the source, the title and why you picked it. Clips are in
    `%USERPROFILE%\Clips\<date>\` with a `.txt` next to each (title, caption, hashtags, source link).
 
