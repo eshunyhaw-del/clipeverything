@@ -51,6 +51,8 @@ def die(msg, code=1):
 def run(cmd, **kw):
     cmd = [str(c) for c in cmd]
     log("$", " ".join(cmd)[:400])
+    if "stdout" not in kw and "capture_output" not in kw:
+        kw["stdout"] = sys.stderr  # keep stdout clean: it carries the JSON result
     return subprocess.run(cmd, **kw)
 
 
@@ -491,7 +493,7 @@ def render_clip(src, ss, dur, words, abs_start, title, out_mp4, workdir,
     out_mp4.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["ffmpeg", "-y", "-v", "error", "-ss", f"{ss:.3f}", "-t", f"{dur:.3f}", "-i", str(src),
            "-filter_complex", fc, "-map", "[v]", "-map", "0:a?",
-           "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+           "-c:v", "libx264", "-preset", "medium", "-crf", "22", "-pix_fmt", "yuv420p",
            "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k",
            "-movflags", "+faststart", str(out_mp4)]
     r = run(cmd, cwd=str(workdir))
