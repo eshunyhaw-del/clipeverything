@@ -521,9 +521,14 @@ def credit_block(meta):
     url = meta.get("webpage_url") or meta.get("source") or ""
     title = meta.get("title") or ""
     if "creative commons" in lic.lower():
-        return ("CREDIT (the license requires this - paste it into your post):\n"
-                f'Clip from "{title}" by {who}, licensed CC BY. Original: {url} - edited for length and format.\n'
-                "Do not imply the creator endorses you.")
+        return ("CREDIT (the license requires this - paste it into your post):\n\n"
+                "### Content Attribution\n\n"
+                f"**Original Title:** {title}\n\n"
+                f"**Creator:** {who}\n\n"
+                f"**Source:** {url}\n\n"
+                "**Licence:** Creative Commons Attribution (CC BY).\n\n"
+                "This material is used under the Creative Commons Attribution licence. "
+                "Modifications have been made where applicable.")
     return ("CREDIT - NO REUSE LICENSE DETECTED: this is probably standard copyright. Get the creator's "
             "permission before posting publicly.\n"
             f'If you have permission, credit it like: "Clip from "{title}" by {who}, {url}, used with permission."')
